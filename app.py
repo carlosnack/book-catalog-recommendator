@@ -30,7 +30,7 @@ def recommend_books(book_title, n_recommendations=5):
 
 
 # Seleciona e renomeia colunas importantes do DataFrame de livros
-books = books[['ISBN', 'Book-Title', 'Book-Author', 'Year-Of-Publication', 'Publisher']]
+books = books[['ISBN', 'Book-Title', 'Book-Author', 'Year-Of-Publication', 'Publisher', 'Image-URL-S']]
 books.rename(columns={'Book-Title': 'title', 'Book-Author': 'author', 'Year-Of-Publication': 'year', 'Publisher': 'publisher'}, inplace=True)
 
 # Seleciona e renomeia colunas relevantes do DataFrame de avaliações
@@ -95,10 +95,11 @@ def home_page():
         col = columns[idx % 3]  # Alterna entre as colunas
         with col:
             # Truncar título para evitar desalinhamento
-            truncated_title = row['title'].ljust(100)
+            truncated_title = row['title'][:30] + '...' if len(row['title']) > 30 else row['title']
             
-            # Placeholder para a imagem do livro
-            st.image("https://via.placeholder.com/150", caption=truncated_title, width=150)
+            image_url = books[books['title'] == row['title']]['Image-URL-S'].values[0]
+
+            st.image(image_url if pd.notna(image_url) else "https://via.placeholder.com/150", caption=truncated_title, width=150)
             
             # Mostrar avaliação e número de avaliações
             st.markdown(f"⭐ **{row['rating']:.2f}** ({row['number_of_ratings']} avaliações)")
