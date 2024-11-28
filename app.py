@@ -80,13 +80,11 @@ if 'book_selected' not in st.session_state:
 # Função para exibir a página inicial
 def home_page():
     st.title("Catálogo de Livros - Recomendações Personalizadas")
-    st.subheader("Descubra livros incríveis e veja recomendações baseadas em suas preferências!")
+    st.subheader("Descubra livros incríveis e veja recomendações baseadas nas avaliações dos usuários e no livro selecionado!")
 
     # Exibir os livros mais populares
     most_popular = popular_books.groupby('title').agg({'rating': 'mean', 'number_of_ratings': 'max'}).reset_index()
-    most_popular = most_popular.sort_values(by='number_of_ratings', ascending=False).head(30)
-
-    st.write("### Livros Mais Populares:")
+    most_popular = most_popular.sort_values(by='number_of_ratings', ascending=False).head(120)
 
 
     # Criar uma grade de livros em formato de cards
@@ -117,6 +115,9 @@ def details_page():
 
         st.write(f"### Detalhes do Livro: {book_selected}")
         book_info = books[books['title'] == book_selected].iloc[0]
+        image_url = books[books['title'] == book_selected]['Image-URL-L'].values[0]
+        st.image(image_url, caption=book_selected, use_container_width=True)
+        
         st.write(f"- **Autor:** {book_info['author']}")
         st.write(f"- **Ano de Publicação:** {book_info['year']}")
         st.write(f"- **Editora:** {book_info['publisher']}")
@@ -129,7 +130,8 @@ def details_page():
         for rec_idx, rec_title in enumerate(recommendations):
             rec_col = rec_columns[rec_idx % 5]
             with rec_col:
-                st.image("https://via.placeholder.com/150", caption=rec_title, use_container_width=True)
+                rec_image_url = books[books['title'] == rec_title]['Image-URL-L'].values[0]
+                st.image(rec_image_url, caption=rec_title, use_container_width=True)
                 avg_rating = popular_books[popular_books['title'] == rec_title]['rating'].mean()
                 st.markdown(f"⭐ **{avg_rating:.2f}**")
 
